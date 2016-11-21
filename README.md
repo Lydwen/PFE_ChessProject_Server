@@ -1,2 +1,2 @@
-# PFE_ChessProject_Server
-The server of chessproject, our final year project.
+# PFE ChessProject Server
+The server of ChessProject, our final year project.
