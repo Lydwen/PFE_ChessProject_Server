@@ -1,0 +1,6 @@
+{
+	"ImportPath": "github.com/haagor/PFE_ChessProject_Server",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v75",
+	"Deps": []
+}
