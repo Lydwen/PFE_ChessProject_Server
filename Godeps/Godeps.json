@@ -1,9 +1,6 @@
 {
-	"ImportPath": "github.com/Lydwen/PFE_ChessProject_Server/src",
+	"ImportPath": "github.com/Lydwen/PFE_ChessProject_Server",
 	"GoVersion": "go1.7",
 	"GodepVersion": "v75",
-	"Packages": [
-		"./..."
-	],
 	"Deps": []
 }
