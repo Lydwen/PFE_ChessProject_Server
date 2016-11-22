@@ -19,8 +19,8 @@ func main() {
     router.HandleFunc("/player", handlePlayerClient).Methods("POST")
 
     fmt.Println("listening...")
-    //err := http.ListenAndServe(":"+os.Getenv("PORT"), router)
-    err := http.ListenAndServe(":1234", router)
+    err := http.ListenAndServe(":"+os.Getenv("PORT"), router)
+    //err := http.ListenAndServe(":1234", router)
     if err != nil {
         panic(err)
     }
