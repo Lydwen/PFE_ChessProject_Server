@@ -5,17 +5,18 @@ import (
     "bufio"
     "log"
     "fmt"
+    "os"
 )
 
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
     defer conn.Close()
-    fmt.Fprintf(conn, "nickname? ")
     reader := bufio.NewReader(conn)
-    nickname,err := reader.ReadString('\n')
+    nickname,err := reader.ReadBytes(';')
     if err != nil {
         log.Println(err)
         return
     }
+    fmt.Printf("j'ai dit à %s 'hello'\n", nickname)
     fmt.Fprintf(conn, "hello %s", nickname)
 
     c := make(chan string)
@@ -68,7 +69,8 @@ func save(game chan string) {
 }
 
 func main() {
-    listener, err := net.Listen("tcp", "localhost:1234")
+    //listener, err := net.Listen("tcp", "localhost:1234")
+    listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
     if err != nil {
         log.Fatal(err)
     }
