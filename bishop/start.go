@@ -22,13 +22,13 @@ type Msg struct {
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
     defer conn.Close()
     reader := bufio.NewReader(conn)
-    nickname,err := reader.ReadString('\n')
-    if err != nil {
-        log.Println(err)
-        return
-    }
-    fmt.Printf("j'ai dit à %s 'hello'\n", nickname)
-    fmt.Fprintf(conn, "hello %s", nickname)
+    // nickname,err := reader.ReadString('\n')
+    // if err != nil {
+    //     log.Println(err)
+    //     return
+    // }
+    // fmt.Printf("j'ai dit à %s 'hello'\n", nickname)
+    // fmt.Fprintf(conn, "hello %s", nickname)
 
     c := make(chan string)
     if id == 0 {
@@ -79,6 +79,7 @@ func save(game chan string) {
         res := Msg{}
         json.Unmarshal([]byte(msg), &res)
         fmt.Println(res)
+        updateCube(res.Face, res.X, res.Y)
     }
 }
 
@@ -112,7 +113,6 @@ func main() {
 //      >>>>>>>>>>>> gestion CUBE <<<<<<<<<<<<<
 
 func initCube() {
-    var cube map[int][49]int
     cube = make(map[int][49]int)
     for i := 0; i < 6; i++ {
         cube[i] = [49]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -120,6 +120,15 @@ func initCube() {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             0, 0, 0, 0, 0, 0}
     }
+    fmt.Println(cube)
+}
+
+
+func updateCube(face int, x int, y int) {
+    coord := y * 7 + x
+    f := cube[face]
+    f[coord] = 1
+    cube[face] = f
     fmt.Println(cube)
 }
 
