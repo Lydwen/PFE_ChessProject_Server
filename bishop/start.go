@@ -10,13 +10,23 @@ import (
 )
 
 
-var cube map[int][49]int
+var cube map[int][64]int
 
-//{"face": 1,"x": 1,"y":1}
-type Msg struct {
+//{"face": 1,"x": 7,"y":7}
+type Init struct {
     Face    int     `json:"face"`
     X       int     `json:"x"`
     Y       int     `json:"y"`
+}
+
+//{"face_old": 1, "x_old": 7, "y_old":7, "face_new": 1, "x_new": 7, "y_new":7}
+type Move struct {
+    FaceO    int     `json:"face_old"`
+    Xo       int     `json:"x_old"`
+    Yo       int     `json:"y_old"`
+    FaceN    int     `json:"face_new"`
+    Xn       int     `json:"x_new"`
+    Yn       int     `json:"y_new"`
 }
 
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
@@ -76,10 +86,10 @@ func save(game chan string) {
     for {
         msg := <- game
         fmt.Println(msg)
-        res := Msg{}
+        res := Move{}
         json.Unmarshal([]byte(msg), &res)
         fmt.Println(res)
-        updateCube(res.Face, res.X, res.Y)
+        updateCube(res.FaceO, res.Xo, res.Yo, res.FaceN, res.Xn, res.Yn)
     }
 }
 
@@ -113,22 +123,29 @@ func main() {
 //      >>>>>>>>>>>> gestion CUBE <<<<<<<<<<<<<
 
 func initCube() {
-    cube = make(map[int][49]int)
+    cube = make(map[int][64]int)
     for i := 0; i < 6; i++ {
-        cube[i] = [49]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+        cube[i] = [64]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0}
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+            0, 0, 0, 0, 0}
     }
     fmt.Println(cube)
 }
 
 
-func updateCube(face int, x int, y int) {
-    coord := y * 7 + x
-    f := cube[face]
-    f[coord] = 1
-    cube[face] = f
+func updateCube(faceO int, xo int, yo int, faceN int, xn int, yn int) {
+    coordO := yo * 8 + xo
+    fo := cube[faceO]
+    fo[coordO] = 0
+    cube[faceO] = fo
+    fmt.Println(cube)
+
+    coordN := yn * 8 + xn
+    fn := cube[faceN]
+    fn[coordN] = 1
+    cube[faceN] = fn
     fmt.Println(cube)
 }
 
