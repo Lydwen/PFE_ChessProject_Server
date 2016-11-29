@@ -5,13 +5,24 @@ import (
     "bufio"
     "log"
     "fmt"
-    "os"
+    "encoding/json"
+    //"os"
 )
+
+
+var cube map[int][49]int
+
+//{"face": 1,"x": 1,"y":1}
+type Msg struct {
+    Face    int     `json:"face"`
+    X       int     `json:"x"`
+    Y       int     `json:"y"`
+}
 
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
     defer conn.Close()
     reader := bufio.NewReader(conn)
-    nickname,err := reader.ReadBytes(';')
+    nickname,err := reader.ReadString('\n')
     if err != nil {
         log.Println(err)
         return
@@ -65,12 +76,16 @@ func save(game chan string) {
     for {
         msg := <- game
         fmt.Println(msg)
+        res := Msg{}
+        json.Unmarshal([]byte(msg), &res)
+        fmt.Println(res)
     }
 }
 
 func main() {
-    //listener, err := net.Listen("tcp", "localhost:1234")
-    listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
+    initCube()
+    listener, err := net.Listen("tcp", "localhost:1234")
+    //listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
     if err != nil {
         log.Fatal(err)
     }
@@ -92,3 +107,19 @@ func main() {
         acc = acc + 1
     }
 }
+
+
+//      >>>>>>>>>>>> gestion CUBE <<<<<<<<<<<<<
+
+func initCube() {
+    var cube map[int][49]int
+    cube = make(map[int][49]int)
+    for i := 0; i < 6; i++ {
+        cube[i] = [49]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+            0, 0, 0, 0, 0, 0}
+    }
+    fmt.Println(cube)
+}
+
