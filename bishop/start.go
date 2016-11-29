@@ -9,15 +9,8 @@ import (
     //"os"
 )
 
-
-var cube map[int][64]int
-
-//{"face": 1,"x": 7,"y":7}
-type Init struct {
-    Face    int     `json:"face"`
-    X       int     `json:"x"`
-    Y       int     `json:"y"`
-}
+const SIZE int = 8
+var cube map[int][SIZE * SIZE]int
 
 //{"face_old": 1, "x_old": 7, "y_old":7, "face_new": 1, "x_new": 7, "y_new":7}
 type Move struct {
@@ -32,15 +25,8 @@ type Move struct {
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
     defer conn.Close()
     reader := bufio.NewReader(conn)
-    // nickname,err := reader.ReadString('\n')
-    // if err != nil {
-    //     log.Println(err)
-    //     return
-    // }
-    // fmt.Printf("j'ai dit à %s 'hello'\n", nickname)
-    // fmt.Fprintf(conn, "hello %s", nickname)
-
     c := make(chan string)
+    
     if id == 0 {
         go listenP1_writeP2(c, connC, conn, game)
     } else {
@@ -117,35 +103,5 @@ func main() {
         go handleConnection(conn, acc, connC, game)
         acc = acc + 1
     }
-}
-
-
-//      >>>>>>>>>>>> gestion CUBE <<<<<<<<<<<<<
-
-func initCube() {
-    cube = make(map[int][64]int)
-    for i := 0; i < 6; i++ {
-        cube[i] = [64]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0}
-    }
-    fmt.Println(cube)
-}
-
-
-func updateCube(faceO int, xo int, yo int, faceN int, xn int, yn int) {
-    coordO := yo * 8 + xo
-    fo := cube[faceO]
-    fo[coordO] = 0
-    cube[faceO] = fo
-    fmt.Println(cube)
-
-    coordN := yn * 8 + xn
-    fn := cube[faceN]
-    fn[coordN] = 1
-    cube[faceN] = fn
-    fmt.Println(cube)
 }
 
