@@ -83,7 +83,7 @@ func save(game chan string) {
 
 func main() {
     initCube()
-    listener, err := net.Listen("tcp", "localhost:1234")
+    //listener, err := net.Listen("tcp", "localhost:1234")
     listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
     if err != nil {
         log.Fatal(err)
