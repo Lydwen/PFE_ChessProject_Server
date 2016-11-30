@@ -89,6 +89,7 @@ func main() {
         log.Fatal(err)
     }
     fmt.Println("listening... on port " + os.Getenv("PORT"))
+    fmt.Println("listening... on port " + os.Getenv("PORT"))
 
     game := make(chan string)
     connC := make(chan net.Conn)
