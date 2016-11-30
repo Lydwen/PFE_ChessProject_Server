@@ -6,7 +6,7 @@ import (
     "log"
     "fmt"
     "encoding/json"
-    //"os"
+    "os"
 )
 
 const SIZE int = 8
@@ -34,13 +34,15 @@ func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan stri
     }
 
     for {
-        line,err := reader.ReadString('\n')
+        fmt.Fprintf(conn, "OK")
+        line,err := reader.ReadBytes('}')
+        stringLine := string(line[:])
+
         if err != nil {
             log.Println(err)
             return
         }
-        line = line
-        c <- line
+        c <- stringLine
     }
 }
 
@@ -82,7 +84,7 @@ func save(game chan string) {
 func main() {
     initCube()
     listener, err := net.Listen("tcp", "localhost:1234")
-    //listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
+    listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
     if err != nil {
         log.Fatal(err)
     }
