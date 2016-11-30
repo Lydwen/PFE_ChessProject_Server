@@ -6,31 +6,27 @@ import (
     "log"
     "fmt"
     "encoding/json"
-    //"os"
+    "os"
 )
 
+const SIZE int = 8
+var cube map[int][SIZE * SIZE]int
 
-var cube map[int][49]int
-
-//{"face": 1,"x": 1,"y":1}
-type Msg struct {
-    Face    int     `json:"face"`
-    X       int     `json:"x"`
-    Y       int     `json:"y"`
+//{"face_old": 1, "x_old": 7, "y_old":7, "face_new": 1, "x_new": 7, "y_new":7}
+type Move struct {
+    FaceO    int     `json:"face_old"`
+    Xo       int     `json:"x_old"`
+    Yo       int     `json:"y_old"`
+    FaceN    int     `json:"face_new"`
+    Xn       int     `json:"x_new"`
+    Yn       int     `json:"y_new"`
 }
 
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
     defer conn.Close()
     reader := bufio.NewReader(conn)
-    nickname,err := reader.ReadString('\n')
-    if err != nil {
-        log.Println(err)
-        return
-    }
-    fmt.Printf("j'ai dit à %s 'hello'\n", nickname)
-    fmt.Fprintf(conn, "hello %s", nickname)
-
     c := make(chan string)
+    
     if id == 0 {
         go listenP1_writeP2(c, connC, conn, game)
     } else {
@@ -38,13 +34,15 @@ func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan stri
     }
 
     for {
-        line,err := reader.ReadString('\n')
+        fmt.Fprintf(conn, "OK")
+        line,err := reader.ReadBytes('}')
+        stringLine := string(line[:])
+
         if err != nil {
             log.Println(err)
             return
         }
-        line = line
-        c <- line
+        c <- stringLine
     }
 }
 
@@ -76,16 +74,17 @@ func save(game chan string) {
     for {
         msg := <- game
         fmt.Println(msg)
-        res := Msg{}
+        res := Move{}
         json.Unmarshal([]byte(msg), &res)
         fmt.Println(res)
+        updateCube(res.FaceO, res.Xo, res.Yo, res.FaceN, res.Xn, res.Yn)
     }
 }
 
 func main() {
     initCube()
     listener, err := net.Listen("tcp", "localhost:1234")
-    //listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
+    listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
     if err != nil {
         log.Fatal(err)
     }
@@ -106,20 +105,5 @@ func main() {
         go handleConnection(conn, acc, connC, game)
         acc = acc + 1
     }
-}
-
-
-//      >>>>>>>>>>>> gestion CUBE <<<<<<<<<<<<<
-
-func initCube() {
-    var cube map[int][49]int
-    cube = make(map[int][49]int)
-    for i := 0; i < 6; i++ {
-        cube[i] = [49]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0}
-    }
-    fmt.Println(cube)
 }
 
