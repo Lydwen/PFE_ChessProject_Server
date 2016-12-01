@@ -6,10 +6,15 @@ import (
     "log"
     "fmt"
     "encoding/json"
-    "os"
+    "strconv"
+    //"os"
 )
 
+
 const SIZE int = 8
+const PORT string = "1234"
+const IP string = "10.212.119.247"
+
 var cube map[int][SIZE * SIZE]int
 
 //{"face_old": 1, "x_old": 7, "y_old":7, "face_new": 1, "x_new": 7, "y_new":7}
@@ -24,6 +29,8 @@ type Move struct {
 
 func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan string) {
     defer conn.Close()
+    defer fmt.Println("Player " + strconv.Itoa(id + 1) + " disconnected")
+    fmt.Println("Player " + strconv.Itoa(id + 1) + " connected")
     reader := bufio.NewReader(conn)
     c := make(chan string)
     
@@ -34,7 +41,6 @@ func handleConnection(conn net.Conn, id int, connC chan net.Conn, game chan stri
     }
 
     for {
-        fmt.Fprintf(conn, "OK")
         line,err := reader.ReadBytes('}')
         stringLine := string(line[:])
 
@@ -83,13 +89,12 @@ func save(game chan string) {
 
 func main() {
     initCube()
-    //listener, err := net.Listen("tcp", "localhost:1234")
-    listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
+    listener, err := net.Listen("tcp", IP+":"+PORT)
+    //listener, err := net.Listen("tcp", "localhost:"+os.Getenv("PORT"))
     if err != nil {
         log.Fatal(err)
     }
-    fmt.Println("listening... on port " + os.Getenv("PORT"))
-    fmt.Println("listening... on port " + os.Getenv("PORT"))
+    fmt.Println("listening...")
 
     game := make(chan string)
     connC := make(chan net.Conn)
